@@ -1,9 +1,9 @@
 import express from 'express';
 import cors from 'cors';
+import fileUpload from 'express-fileupload';
+import {inicializarFirebase} from "./database";
 
-import db from "./database";
-
-// Inicializaciones
+// Inicializamos el servidor express
 export const app = express();
 
 // Opciones
@@ -13,26 +13,21 @@ app.set('port', 8080);
 //Cuando me envíen un json entenderlo
 app.use(express.json());
 //Cuando me envíen un formulario poder entenderlo
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({extended: true}));
+//Para que me deje de molestar el cors
 app.use(cors());
+//Para poder enviar imagenes por express
+app.use(fileUpload());
 
-// Routes
-app.post("/register", async (req: express.Request, res: express.Response): Promise<void> => {
+// Para obtener la referencia de la bd en otros archivos
+export const firestore =  inicializarFirebase.firestore();
+// Para obtener la referencia de auth
+export const auth = inicializarFirebase.auth();
 
-   const a = await db.collection("cities").doc("c").set({
-      name: "Los Angeles",
-      state: "CA",
-      country: "es"
-   })
-
-   const b = db.collectionGroup('cities').where('country', '==', 'USA').get().then(function(querySnapshot) {
-      querySnapshot.forEach(function(doc) {
-         console.log(doc.id, ' => ', doc.data());
-      });
-   });
-});
-
-// Static files
+// Routes (Para que se puedan utilizar las routes en otros archivos)
+//Le digo a express que hay rutas en ese archivo para que las use (app.use puedes poner la ruta que quieras)
+const user = require("./routes/users/RoutesUsers");
+app.use('/', user);
 
 //Arrancar el servidor
 app.listen(app.get('port'), () => {

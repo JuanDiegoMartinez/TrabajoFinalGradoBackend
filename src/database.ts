@@ -2,6 +2,8 @@ import firebase from "firebase/app";
 
 //Para habilitar toda la configuración de la bd firestore
 import "firebase/firestore";
+//Para habilitar toda la configuración de auth
+import "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,9 +18,6 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+export const inicializarFirebase = firebase.initializeApp(firebaseConfig);
 
-console.log("Base de datos de Firebase conectada");
-
-// Para obtener la referencia de la bd en otros archivos
-export default firebase.firestore();
+console.log("Firebase activo");

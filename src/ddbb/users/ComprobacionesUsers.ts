@@ -1,10 +1,29 @@
-import db from "../../database";
-import {COLLECTION_USUARIOS} from "../Collections";
+import {COLLECTION_GROUP_USUARIOS} from "../Collections";
 
-export const compruebaUser = (user: string) => {
-    //COLLECTION_USUARIOS.where(user, '==', ).get()
+//Comprueba que el alias no está cogido
+export const compruebaUser = async (user: string): Promise<boolean> => {
+
+    let esta = false;
+
+    await COLLECTION_GROUP_USUARIOS.where('user', '==', user).get().then(function(querySnapshot) {
+
+        if (querySnapshot.size >= 1) {
+            esta = true;
+        }
+    });
+    return esta;
 }
 
-export const compruebaEmail = () => {
+//Comprueba que el email no esté cogido
+export const compruebaEmail = async (email: string): Promise<boolean> => {
 
+    let esta = false;
+
+    await COLLECTION_GROUP_USUARIOS.where('email', '==', email).get().then(function(querySnapshot) {
+
+        if (querySnapshot.size >= 1) {
+            esta = true;
+        }
+    });
+    return esta;
 }
