@@ -1,4 +1,5 @@
 import express from 'express';
+import session from 'express-session';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
 import {inicializarFirebase} from "./database";
@@ -18,16 +19,30 @@ app.use(express.urlencoded({extended: true}));
 app.use(cors());
 //Para poder enviar imagenes por express
 app.use(fileUpload());
+//Para utilizar sesiones
+app.use(session({
+   secret: 'secreto',
+   resave: true,
+   saveUninitialized: true
+}));
 
 // Para obtener la referencia de la bd en otros archivos
 export const firestore =  inicializarFirebase.firestore();
 // Para obtener la referencia de auth
 export const auth = inicializarFirebase.auth();
 
+// Api noticias
+const NewsAPI = require('newsapi');
+export const newsapi = new NewsAPI('4cc63e54f7ee4987b41f8b3f23b3e663');
+
 // Routes (Para que se puedan utilizar las routes en otros archivos)
 //Le digo a express que hay rutas en ese archivo para que las use (app.use puedes poner la ruta que quieras)
 const user = require("./routes/users/RoutesUsers");
-app.use('/', user);
+app.use('/user', user);
+const news = require("./routes/news/RoutesNews");
+app.use('/news', news);
+const videogames = require("./routes/videogames/RoutesVideogames");
+app.use("/videogames", videogames);
 
 //Arrancar el servidor
 app.listen(app.get('port'), () => {

@@ -1,6 +1,6 @@
 import express from 'express';
 import {app} from '../../index';
-import {addUser, compruebaAliasyEmail} from "../../ddbb/users/PeticionesUsers";
+import {addUser, compruebaAliasyEmail, login} from "../../ddbb/users/PeticionesUsers";
 
 //Obtenemos el express.Router() que es un middleware que sirve de direccionador de routes
 const router = express.Router();
@@ -15,6 +15,28 @@ app.post("/compruebaAliasyEmail", async (req: express.Request, res: express.Resp
 app.post("/register", async (req: express.Request, res: express.Response) : Promise<express.Response> => {
     const respuesta = await addUser(req.body);
     return res.send(respuesta);
+});
+
+//Recibe un Login para iniciar sesión del usuario
+app.post("/login", async (req: express.Request, res: express.Response) : Promise<express.Response> => {
+    console.log("request.body: ", req.body);
+    const respuesta = await login(req.body);
+
+    console.log("soy la session: ", req.session);
+    // @ts-ignore
+    req.session.userData = respuesta;
+    console.log("soy la session después de añadir datos: ", req.session);
+    // @ts-ignore
+    //console.log("respuesta: ", req.session.userData);
+    return res.send(req.session.userData);
+});
+
+//Obtener la sesion del usuario
+app.get("/session", async (req: express.Request, res: express.Response) : Promise<any> => {
+    // @ts-ignore
+    console.log("respuesta en sesion: ", req.session.userData);
+    // @ts-ignore
+    return res.send(req.session.useData);
 });
 
 
