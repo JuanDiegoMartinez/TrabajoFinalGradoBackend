@@ -37,7 +37,7 @@ const NewsAPI = require('newsapi');
 export const newsapi = new NewsAPI('4cc63e54f7ee4987b41f8b3f23b3e663');
 
 //Inicializar la bbdd con datos
-obtenerVideojuegos().then(r => {});
+//obtenerVideojuegos().then(r => {});
 
 
 // Routes (Para que se puedan utilizar las routes en otros archivos)
