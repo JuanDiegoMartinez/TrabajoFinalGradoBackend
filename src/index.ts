@@ -3,6 +3,7 @@ import session from 'express-session';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
 import {inicializarFirebase} from "./database";
+import {obtenerVideojuegos} from "./peticionesUnicas";
 
 // Inicializamos el servidor express
 export const app = express();
@@ -34,6 +35,10 @@ export const auth = inicializarFirebase.auth();
 // Api noticias
 const NewsAPI = require('newsapi');
 export const newsapi = new NewsAPI('4cc63e54f7ee4987b41f8b3f23b3e663');
+
+//Inicializar la bbdd con datos
+obtenerVideojuegos().then(r => {});
+
 
 // Routes (Para que se puedan utilizar las routes en otros archivos)
 //Le digo a express que hay rutas en ese archivo para que las use (app.use puedes poner la ruta que quieras)
