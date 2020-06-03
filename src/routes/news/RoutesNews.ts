@@ -1,30 +1,34 @@
 import express from "express";
 import {app} from '../../index';
-import {comprobarFecha} from "../../ddbb/news/ComprobacionesNews";
-import {obtenerUltimasNoticias, pedirNoticiasApi} from "../../ddbb/news/PeticionesNews";
+import {buscarNoticias, obtenerUltimasNoticias} from "../../ddbb/news/PeticionesNews";
 
 //Obtenemos el express.Router() que es un middleware que sirve de direccionador de routes
 const router = express.Router();
 
-//Obtener las últimas noticias
-app.get("/ultimasNoticias", async (req: express.Request, res: express.Response): Promise<void> => {
+//Obtener todas las noticias de la bbdd
+app.post("/obtenerNoticias", async (req: express.Request, res: express.Response): Promise<void> => {
 
-    //Comprobar si están en la bbdd
-    const llamadaApi = await comprobarFecha();
+    console.log(req.body.page);
 
-    if (llamadaApi) {
-        await pedirNoticiasApi();
-        await sleep(3500);
-    }
+    // @ts-ignore
+    req.session.page = req.body .page;
 
     const respuesta = await obtenerUltimasNoticias();
 
     res.send(respuesta);
 })
 
-function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+//Barra de búsqueda de noticias
+app.get("/busquedaNoticias", async (req: express.Request, res: express.Response): Promise<void> => {
+
+    // @ts-ignore
+    console.log("me han llamado: ", req.session.page);
+    const respuesta = await buscarNoticias();
+
+    res.send(respuesta);
+})
+
+
 
 //Hay que importarlo
 module.exports = router;

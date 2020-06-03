@@ -40,7 +40,6 @@ export const login = async (data: Login): Promise<any> => {
 
             querySnapshot.forEach((object: any) => {
                 user = object.data();
-
             })
         });
     }

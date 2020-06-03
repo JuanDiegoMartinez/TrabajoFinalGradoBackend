@@ -1,8 +1,87 @@
 import axios from "axios";
 import {storeVideogame, Videogame} from "./models/Videogame";
-import {COLLECTION_VIDEOJUEGOS} from "./ddbb/Collections";
+import {COLLECTION_NOTICIAS, COLLECTION_VIDEOJUEGOS} from "./ddbb/Collections";
+import express from "express";
+import {app, firestore, newsapi} from "./index";
+import {deleteCollection} from "./ddbb/CollectionsDelete";
+import {News} from "./models/News";
 
-export const obtenerVideojuegos = async () => {
+//Obtenemos el express.Router() que es un middleware que sirve de direccionador de routes
+const router = express.Router();
+
+const exec = require('child_process').exec;
+
+app.get("/unicaPeticionApi", async (req: express.Request, res: express.Response): Promise<void> => {
+
+    obtenerVideojuegosApi();
+    obtenerNoticiasApi();
+})
+
+//Obtener noticias de la api
+const obtenerNoticiasApi = async (): Promise<void> => {
+
+    //Borramos las noticias de la bbdd
+    await deleteCollection(firestore, COLLECTION_NOTICIAS.path, 500);
+
+    //Obtenemos las últimas noticias
+    const response = await newsapi.v2.topHeadlines({
+        category: 'technology',
+        country: 'mx',
+        pageSize: 10
+    })
+
+    let numNoticia = 0;
+
+    response.articles.forEach((articulo: any) => {
+
+        const command = `curl ${articulo.url} | unfluff`;
+
+        exec(command, (error: any, stdout: any, stderr: any) => {
+
+            let noticia: News = {
+                author: articulo.author,
+                title: articulo.title,
+                description: articulo.description,
+                urlNews: articulo.url,
+                urlImage: articulo.urlToImage,
+                published: articulo.publishedAt.substring(0, 10),
+                content: ""
+            }
+
+            //Obtenemos toda la noticia
+            let texto = JSON.parse(stdout);
+
+            if (texto.text !== "") {
+
+                if (articulo.author === null) {
+                    noticia.author = "Anónimo"
+                }
+
+                let textoTroceado = texto.text.split('\n');
+                let contenidoNoticia = "";
+
+                textoTroceado.forEach((elem: any) => {
+
+                    if (elem.length > 0) {
+                        contenidoNoticia += elem + "<br/><br/>";
+                    }
+                })
+
+                noticia.content = contenidoNoticia;
+
+                let numNoticiaString = numNoticia.toString();
+                COLLECTION_NOTICIAS.doc(numNoticiaString).set(noticia);
+                numNoticia++;
+            }
+        });
+    })
+}
+
+//Obtener los videojuego de la api
+const obtenerVideojuegosApi = async (): Promise<void> => {
+
+    //Borramos las noticias de la bbdd
+    await deleteCollection(firestore, COLLECTION_VIDEOJUEGOS.path, 500);
 
     const Axios = axios.create({
         baseURL: 'https://api.rawg.io/api'
@@ -11,11 +90,11 @@ export const obtenerVideojuegos = async () => {
     let contador = 0;
 
     //Bucle para cambiar la página ya que solo envía 40
-    for (let i = 1; i < 5; i++) {
+    for (let i = 1; i <= 1; i++) {
 
         const response = await Axios.get("/games", {
             params: {
-                page_size: 1,
+                page_size: 40,
                 page: i
             }
         });
@@ -50,6 +129,7 @@ export const obtenerVideojuegos = async () => {
             let tiendas: storeVideogame[] = [];
 
             data.stores.forEach((store: any) => {
+
                 tiendas.push({
                     name: store.store.name,
                     url: store.url
@@ -62,7 +142,6 @@ export const obtenerVideojuegos = async () => {
             data.developers.forEach((developer: any) => {
                 desarrolladores.push(developer.name)
             })
-
 
             //Generos
             let generos: string[] = [];
@@ -81,6 +160,20 @@ export const obtenerVideojuegos = async () => {
                 }
             })
 
+            //Metacritic
+            let urlCritica = "N/A";
+
+            if (data.metacritic_platforms[0] !== undefined) {
+                urlCritica = data.metacritic_platforms[0].url
+            }
+
+            //Clip
+            let video = "N/A"
+
+            if (data.clip !== null) {
+                video = data.clip.clip;
+            }
+
             const videogame: Videogame = {
                 name: data.name,
                 slug: data.slug,
@@ -88,20 +181,23 @@ export const obtenerVideojuegos = async () => {
                 lanzamiento: data.released,
                 description: data.description,
                 metacritic: data.metacritic,
-                urlMetacritic: data.metacritic_platforms[0].url,
+                urlMetacritic: urlCritica,
                 platforms: plataformas,
                 genres: generos,
                 stores: tiendas,
                 developers: desarrolladores,
-                clip: data.clip.clip,
+                clip: video,
                 tags: etiquetas,
                 screenshots: imagenes,
                 website: data.website
             }
 
             let contadorString = contador.toString();
-            await COLLECTION_VIDEOJUEGOS.doc(contadorString).set(videogame);
+            COLLECTION_VIDEOJUEGOS.doc(contadorString).set(videogame);
             contador++;
         });
     }
 }
+
+//Hay que importarlo
+module.exports = router;

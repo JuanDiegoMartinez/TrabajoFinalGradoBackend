@@ -20,11 +20,13 @@ app.post("/register", async (req: express.Request, res: express.Response) : Prom
 //Recibe un Login para iniciar sesión del usuario
 app.post("/login", async (req: express.Request, res: express.Response) : Promise<express.Response> => {
     console.log("request.body: ", req.body);
-    const respuesta = await login(req.body);
+    //const respuesta = await login(req.body);
 
+    // @ts-ignore
+    req.session.domain(".app.localhost");
     console.log("soy la session: ", req.session);
     // @ts-ignore
-    req.session.userData = respuesta;
+    req.session.userData = "hola";
     console.log("soy la session después de añadir datos: ", req.session);
     // @ts-ignore
     //console.log("respuesta: ", req.session.userData);
@@ -36,7 +38,7 @@ app.get("/session", async (req: express.Request, res: express.Response) : Promis
     // @ts-ignore
     console.log("respuesta en sesion: ", req.session.userData);
     // @ts-ignore
-    return res.send(req.session.useData);
+    return res.send(req.session.userData);
 });
 
 

@@ -1,69 +1,8 @@
 import {COLLECTION_NOTICIAS} from "../Collections";
-import {deleteCollection} from "../CollectionsDelete";
-import {firestore, newsapi} from "../../index";
 import {News} from "../../models/News";
 
-const exec = require('child_process').exec;
-
-//Obtener noticias de la api
-export const pedirNoticiasApi = async (): Promise<void> => {
-
-    //Borramos las noticias de la bbdd
-    await deleteCollection(firestore, COLLECTION_NOTICIAS.path, 500);
-
-    //Obtenemos las últimas noticias
-    const response = await newsapi.v2.topHeadlines({
-        category: 'technology',
-        country: 'mx',
-        pageSize: 50
-    })
-
-    let numNoticia = 0;
-    let mierda: number[] = [];
-
-    response.articles.forEach((articulo: any) => {
-
-        const command = `curl ${articulo.url} | unfluff`;
-
-        exec(command, (error: any, stdout: any, stderr: any) => {
-
-            let noticia: News = {
-                author: articulo.author,
-                title: articulo.title,
-                description: articulo.description,
-                urlNews: articulo.url,
-                urlImage: articulo.urlToImage,
-                published: articulo.publishedAt.substring(0, 10),
-                content: articulo.content
-            }
-
-            //Obtenemos toda la noticia
-            let texto = JSON.parse(stdout);
-
-            if (texto.text !== "") {
-
-                if (articulo.author === null) {
-                    noticia.author = "Anónimo"
-                }
-
-                noticia.content = texto.text;
-
-                let numNoticiaString = numNoticia.toString();
-
-                COLLECTION_NOTICIAS.doc(numNoticiaString).set(noticia);
-
-                mierda.push(numNoticia);
-                console.log(mierda);
-
-                numNoticia++
-            }
-        });
-    })
-    console.log("soy la última mierda: ",mierda);
-}
-
 export const obtenerUltimasNoticias = async (): Promise<News[]> => {
-
+    /*
     let listaNoticias: News[] = [];
 
     await COLLECTION_NOTICIAS.get().then( (snapshot) => {
@@ -73,12 +12,109 @@ export const obtenerUltimasNoticias = async (): Promise<News[]> => {
             listaNoticias.push(noticia.data());
         })
     })
-
     return listaNoticias;
+     */
+    return [{
+        author: "Juan diego",
+        content: "dñkjfaklsdjfkñdsafkas",
+        description: "jñfsdjfklñsadjfkadsjfasfjfkñadsjf",
+        published: "2020-20-03",
+        title: "noticia",
+        urlImage: "https://larepublica.pe/resizer/B5Nd_2IJYBLDTL9Iyq8QXXie3Gs=/1200x660/top/cloudfront-us-east-1.images.arcpublishing.com/gruporepublica/ZNP2DVKXSFEEXKDOEO67AKUNPA.jpg",
+        urlNews: "https://larepublica.pe/tendencias/2020/05/29/google-maps-visita-famoso-parque-de-estados-unidos-y-capta-a-shrek-con-fiona-en-divertida-escena-fotos-google-street-view-google-earth-hollywood-universal-studios-redes-sociales/"
+        },
+        {
+            author: "Juan diego",
+            content: "dñkjfaklsdjfkñdsafkas",
+            description: "jñfsdjfklñsadjfkadsjfasfjfkñadsjf",
+            published: "2020-20-03",
+            title: "noticia",
+            urlImage: "https://larepublica.pe/resizer/B5Nd_2IJYBLDTL9Iyq8QXXie3Gs=/1200x660/top/cloudfront-us-east-1.images.arcpublishing.com/gruporepublica/ZNP2DVKXSFEEXKDOEO67AKUNPA.jpg",
+            urlNews: "https://larepublica.pe/tendencias/2020/05/29/google-maps-visita-famoso-parque-de-estados-unidos-y-capta-a-shrek-con-fiona-en-divertida-escena-fotos-google-street-view-google-earth-hollywood-universal-studios-redes-sociales/"
+        },
+        {
+            author: "Juan diego",
+            content: "dñkjfaklsdjfkñdsafkas",
+            description: "jñfsdjfklñsadjfkadsjfasfjfkñadsjf",
+            published: "2020-20-03",
+            title: "noticia",
+            urlImage: "https://larepublica.pe/resizer/B5Nd_2IJYBLDTL9Iyq8QXXie3Gs=/1200x660/top/cloudfront-us-east-1.images.arcpublishing.com/gruporepublica/ZNP2DVKXSFEEXKDOEO67AKUNPA.jpg",
+            urlNews: "https://larepublica.pe/tendencias/2020/05/29/google-maps-visita-famoso-parque-de-estados-unidos-y-capta-a-shrek-con-fiona-en-divertida-escena-fotos-google-street-view-google-earth-hollywood-universal-studios-redes-sociales/"
+        },
+        {
+            author: "Juan diego",
+            content: "dñkjfaklsdjfkñdsafkas",
+            description: "jñfsdjfklñsadjfkadsjfasfjfkñadsjf",
+            published: "2020-20-03",
+            title: "noticia",
+            urlImage: "https://larepublica.pe/resizer/B5Nd_2IJYBLDTL9Iyq8QXXie3Gs=/1200x660/top/cloudfront-us-east-1.images.arcpublishing.com/gruporepublica/ZNP2DVKXSFEEXKDOEO67AKUNPA.jpg",
+            urlNews: "https://larepublica.pe/tendencias/2020/05/29/google-maps-visita-famoso-parque-de-estados-unidos-y-capta-a-shrek-con-fiona-en-divertida-escena-fotos-google-street-view-google-earth-hollywood-universal-studios-redes-sociales/"
+        },
+        {
+            author: "Juan diego",
+            content: "dñkjfaklsdjfkñdsafkas",
+            description: "jñfsdjfklñsadjfkadsjfasfjfkñadsjf",
+            published: "2020-20-03",
+            title: "noticia",
+            urlImage: "https://larepublica.pe/resizer/B5Nd_2IJYBLDTL9Iyq8QXXie3Gs=/1200x660/top/cloudfront-us-east-1.images.arcpublishing.com/gruporepublica/ZNP2DVKXSFEEXKDOEO67AKUNPA.jpg",
+            urlNews: "https://larepublica.pe/tendencias/2020/05/29/google-maps-visita-famoso-parque-de-estados-unidos-y-capta-a-shrek-con-fiona-en-divertida-escena-fotos-google-street-view-google-earth-hollywood-universal-studios-redes-sociales/"
+        },
+        {
+            author: "Juan diego",
+            content: "dñkjfaklsdjfkñdsafkas",
+            description: "jñfsdjfklñsadjfkadsjfasfjfkñadsjf",
+            published: "2020-20-03",
+            title: "noticia",
+            urlImage: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/styles/1200/public/media/image/2020/04/ps5-stock-limitado-1918919.jpg?itok=KIwzizbr",
+            urlNews: "https://larepublica.pe/tendencias/2020/05/29/google-maps-visita-famoso-parque-de-estados-unidos-y-capta-a-shrek-con-fiona-en-divertida-escena-fotos-google-street-view-google-earth-hollywood-universal-studios-redes-sociales/"
+        },
+        {
+            author: "Juan diego",
+            content: "dñkjfaklsdjfkñdsafkas",
+            description: "jñfsdjfklñsadjfkadsjfasfjfkñadsjf",
+            published: "2020-20-03",
+            title: "noticia",
+            urlImage: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/styles/1200/public/media/image/2020/04/ps5-stock-limitado-1918919.jpg?itok=KIwzizbr",
+            urlNews: "https://larepublica.pe/tendencias/2020/05/29/google-maps-visita-famoso-parque-de-estados-unidos-y-capta-a-shrek-con-fiona-en-divertida-escena-fotos-google-street-view-google-earth-hollywood-universal-studios-redes-sociales/"
+        },
+        {
+            author: "Juan diego",
+            content: "dñkjfaklsdjfkñdsafkas",
+            description: "jñfsdjfklñsadjfkadsjfasfjfkñadsjf",
+            published: "2020-20-03",
+            title: "noticia",
+            urlImage: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/styles/1200/public/media/image/2020/04/ps5-stock-limitado-1918919.jpg?itok=KIwzizbr",
+            urlNews: "https://larepublica.pe/tendencias/2020/05/29/google-maps-visita-famoso-parque-de-estados-unidos-y-capta-a-shrek-con-fiona-en-divertida-escena-fotos-google-street-view-google-earth-hollywood-universal-studios-redes-sociales/"
+        },
+        {
+            author: "Juan diego",
+            content: "dñkjfaklsdjfkñdsafkas",
+            description: "jñfsdjfklñsadjfkadsjfasfjfkñadsjf",
+            published: "2020-20-03",
+            title: "noticia",
+            urlImage: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/styles/1200/public/media/image/2020/04/ps5-stock-limitado-1918919.jpg?itok=KIwzizbr",
+            urlNews: "https://larepublica.pe/tendencias/2020/05/29/google-maps-visita-famoso-parque-de-estados-unidos-y-capta-a-shrek-con-fiona-en-divertida-escena-fotos-google-street-view-google-earth-hollywood-universal-studios-redes-sociales/"
+        },
+        {
+            author: "Juan diego",
+            content: "dñkjfaklsdjfkñdsafkas",
+            description: "jñfsdjfklñsadjfkadsjfasfjfkñadsjf",
+            published: "2020-20-03",
+            title: "noticia",
+            urlImage: "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/styles/1200/public/media/image/2020/04/ps5-stock-limitado-1918919.jpg?itok=KIwzizbr",
+            urlNews: "https://larepublica.pe/tendencias/2020/05/29/google-maps-visita-famoso-parque-de-estados-unidos-y-capta-a-shrek-con-fiona-en-divertida-escena-fotos-google-street-view-google-earth-hollywood-universal-studios-redes-sociales/"
+        },
+    ]
 }
 
-//Probar curl con unfluff
-export const pruebas = async () => {
-
+export const buscarNoticias = async () => {
+    return [{
+        author: "Juan diego",
+        content: "dñkjfaklsdjfkñdsafkas",
+        description: "dfasdfsdafsafasdfds",
+        published: "2020-20-03",
+        title: "noticia",
+        urlImage: "https://larepublica.pe/resizer/B5Nd_2IJYBLDTL9Iyq8QXXie3Gs=/1200x660/top/cloudfront-us-east-1.images.arcpublishing.com/gruporepublica/ZNP2DVKXSFEEXKDOEO67AKUNPA.jpg",
+        urlNews: "https://larepublica.pe/tendencias/2020/05/29/google-maps-visita-famoso-parque-de-estados-unidos-y-capta-a-shrek-con-fiona-en-divertida-escena-fotos-google-street-view-google-earth-hollywood-universal-studios-redes-sociales/"
+    },]
 }
-
