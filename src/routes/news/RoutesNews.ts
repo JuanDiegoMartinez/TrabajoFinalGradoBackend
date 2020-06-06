@@ -1,34 +1,60 @@
 import express from "express";
-import {app} from '../../index';
-import {buscarNoticias, obtenerUltimasNoticias} from "../../ddbb/news/PeticionesNews";
+import {app} from '../../server';
+import {buscarNoticiasPorPalabra, obtenerTodasLasNoticias} from "../../ddbb/news/PeticionesNews";
 
 //Obtenemos el express.Router() que es un middleware que sirve de direccionador de routes
 const router = express.Router();
 
 //Obtener todas las noticias de la bbdd
-app.post("/obtenerNoticias", async (req: express.Request, res: express.Response): Promise<void> => {
-
-    console.log(req.body.page);
+app.get("/obtenerNoticias", async (req: express.Request, res: express.Response): Promise<void> => {
 
     // @ts-ignore
-    req.session.page = req.body .page;
+    const palabra = req.session.palabra;
+    // @ts-ignore
+    const page = req.session.page;
+    // @ts-ignore
+    const rowsPerPage = req.session.rowsPerPage;
 
-    const respuesta = await obtenerUltimasNoticias();
+    // @ts-ignore
+    const noticias = await obtenerTodasLasNoticias(palabra);
 
-    res.send(respuesta);
+    const object = {
+        noticias,
+        palabra,
+        page,
+        rowsPerPage
+    }
+
+    res.send(object);
 })
 
 //Barra de búsqueda de noticias
-app.get("/busquedaNoticias", async (req: express.Request, res: express.Response): Promise<void> => {
+app.post("/busquedaNoticias", async (req: express.Request, res: express.Response): Promise<void> => {
 
     // @ts-ignore
-    console.log("me han llamado: ", req.session.page);
-    const respuesta = await buscarNoticias();
+    req.session.palabra = req.body.palabra;
 
-    res.send(respuesta);
+    // @ts-ignore
+    const palabra = req.session.palabra;
+    // @ts-ignore
+    const page = req.session.page;
+    // @ts-ignore
+    const rowsPerPage = req.session.rowsPerPage;
+
+    // @ts-ignore
+    await req.session.save(function (err) {});
+
+    const noticias = await buscarNoticiasPorPalabra(req.body.palabra);
+
+    const object = {
+        noticias,
+        palabra,
+        page,
+        rowsPerPage
+    }
+
+    res.send(object);
 })
-
-
 
 //Hay que importarlo
 module.exports = router;

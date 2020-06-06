@@ -1,8 +1,7 @@
-import {UserComplete, UserRegister} from "../../models/User";
+import {UserComplete, UserRegister} from "../../models/interfaces/User";
 import {compruebaEmail, compruebaUser} from "./ComprobacionesUsers";
-import {COLLECTION_USUARIOS} from "../Collections";
 import {auth} from "../../index";
-import {Login} from "../../models/Login";
+import Usuarios from "../../models/mongoose/Usuarios";
 
 //Comprueba que el alias y email del usuario no estén cogidos
 export const compruebaAliasyEmail = async (alias: string, email: string): Promise<{estaAlias: boolean, estaEmail: boolean}> => {
@@ -20,11 +19,13 @@ export const addUser = async (data: UserRegister): Promise<boolean> => {
 
     await auth.createUserWithEmailAndPassword(data.email, data.password);
     data.password = "******";
-    let user: UserComplete = {...data, rutaImagen: "", favoritos: []};
-    await COLLECTION_USUARIOS.doc(data.user).set(user);
+    let user: UserComplete = {...data, rutaImagen: "", juegosFavoritos: [], websFavoritas: []};
+    let nuevoUsuario = new Usuarios(user);
+    await nuevoUsuario.save();
     return true;
 };
 
+/*
 //Maneja el login de los usuarios
 export const login = async (data: Login): Promise<any> => {
 
@@ -46,3 +47,4 @@ export const login = async (data: Login): Promise<any> => {
 
     return user;
 }
+ */

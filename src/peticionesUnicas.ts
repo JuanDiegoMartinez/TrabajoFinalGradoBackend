@@ -1,10 +1,14 @@
 import axios from "axios";
-import {storeVideogame, Videogame} from "./models/Videogame";
-import {COLLECTION_NOTICIAS, COLLECTION_VIDEOJUEGOS} from "./ddbb/Collections";
+import {storeVideogame, Videogame} from "./models/interfaces/Videogame";
 import express from "express";
-import {app, firestore, newsapi} from "./index";
-import {deleteCollection} from "./ddbb/CollectionsDelete";
-import {News} from "./models/News";
+import {app} from './server'
+import {News} from "./models/interfaces/News";
+import Noticias from "./models/mongoose/Noticias";
+import Videojuegos from "./models/mongoose/Videojuegos";
+
+// Api noticias
+const NewsAPI = require('newsapi');
+export const newsapi = new NewsAPI('4cc63e54f7ee4987b41f8b3f23b3e663');
 
 //Obtenemos el express.Router() que es un middleware que sirve de direccionador de routes
 const router = express.Router();
@@ -13,15 +17,19 @@ const exec = require('child_process').exec;
 
 app.get("/unicaPeticionApi", async (req: express.Request, res: express.Response): Promise<void> => {
 
-    obtenerVideojuegosApi();
-    obtenerNoticiasApi();
+    await obtenerNoticiasApi();
+    await obtenerVideojuegosApi();
+
 })
 
 //Obtener noticias de la api
 const obtenerNoticiasApi = async (): Promise<void> => {
 
     //Borramos las noticias de la bbdd
-    await deleteCollection(firestore, COLLECTION_NOTICIAS.path, 500);
+    Noticias.collection.drop()
+        .catch((err: any) => {
+            console.log(err.message);
+        });
 
     //Obtenemos las últimas noticias
     const response = await newsapi.v2.topHeadlines({
@@ -29,8 +37,6 @@ const obtenerNoticiasApi = async (): Promise<void> => {
         country: 'mx',
         pageSize: 10
     })
-
-    let numNoticia = 0;
 
     response.articles.forEach((articulo: any) => {
 
@@ -53,6 +59,8 @@ const obtenerNoticiasApi = async (): Promise<void> => {
 
             if (texto.text !== "") {
 
+                console.log("En el if");
+
                 if (articulo.author === null) {
                     noticia.author = "Anónimo"
                 }
@@ -69,9 +77,8 @@ const obtenerNoticiasApi = async (): Promise<void> => {
 
                 noticia.content = contenidoNoticia;
 
-                let numNoticiaString = numNoticia.toString();
-                COLLECTION_NOTICIAS.doc(numNoticiaString).set(noticia);
-                numNoticia++;
+                let Noticia = new Noticias(noticia);
+                Noticia.save();
             }
         });
     })
@@ -81,20 +88,21 @@ const obtenerNoticiasApi = async (): Promise<void> => {
 const obtenerVideojuegosApi = async (): Promise<void> => {
 
     //Borramos las noticias de la bbdd
-    await deleteCollection(firestore, COLLECTION_VIDEOJUEGOS.path, 500);
+    await Videojuegos.collection.drop()
+        .catch((err: any) => {
+            console.log(err.message);
+        });
 
     const Axios = axios.create({
         baseURL: 'https://api.rawg.io/api'
     })
-
-    let contador = 0;
 
     //Bucle para cambiar la página ya que solo envía 40
     for (let i = 1; i <= 1; i++) {
 
         const response = await Axios.get("/games", {
             params: {
-                page_size: 40,
+                page_size: 10,
                 page: i
             }
         });
@@ -192,12 +200,12 @@ const obtenerVideojuegosApi = async (): Promise<void> => {
                 website: data.website
             }
 
-            let contadorString = contador.toString();
-            COLLECTION_VIDEOJUEGOS.doc(contadorString).set(videogame);
-            contador++;
+            let Videojuego = new Videojuegos(videogame);
+            Videojuego.save();
         });
     }
 }
 
 //Hay que importarlo
 module.exports = router;
+

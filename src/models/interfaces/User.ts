@@ -5,7 +5,8 @@ export interface UserComplete {
     password: string,
     nacimiento: string,
     rutaImagen: string,
-    favoritos: string[]
+    juegosFavoritos: string[],
+    websFavoritas: string[]
 }
 
 export interface UserRegister {

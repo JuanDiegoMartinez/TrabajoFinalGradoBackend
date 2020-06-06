@@ -1,13 +1,14 @@
-import {COLLECTION_USUARIOS} from "../Collections";
+import Usuarios from "../../models/mongoose/Usuarios";
+import {UserComplete} from "../../models/interfaces/User";
 
 //Comprueba que el alias no está cogido
 export const compruebaUser = async (user: string): Promise<boolean> => {
 
     let esta = false;
 
-    await COLLECTION_USUARIOS.where('user', '==', user).get().then(function(querySnapshot) {
+    await Usuarios.find({user: user}, (err: any, usuarios: UserComplete[]) => {
 
-        if (querySnapshot.size >= 1) {
+        if (usuarios.length >= 1) {
             esta = true;
         }
     });
@@ -19,9 +20,9 @@ export const compruebaEmail = async (email: string): Promise<boolean> => {
 
     let esta = false;
 
-    await COLLECTION_USUARIOS.where('email', '==', email).get().then(function(querySnapshot) {
+    await Usuarios.find({email: email}, (err: any, usuarios: UserComplete[]) => {
 
-        if (querySnapshot.size >= 1) {
+        if (usuarios.length >= 1) {
             esta = true;
         }
     });
