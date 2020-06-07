@@ -20,3 +20,10 @@ export interface storeVideogame {
     name: string,
     url: string
 }
+
+export interface PartialVideogame {
+    name: string,
+    lanzamiento: string,
+    platforms: string[],
+    urlImage: string
+}

@@ -1,7 +1,6 @@
 import {News} from "../../models/interfaces/News";
 import Noticias from "../../models/mongoose/Noticias";
 
-// @ts-ignore
 export const obtenerTodasLasNoticias = async (palabra: string): Promise<News[]> => {
 
     let listaNoticias: News[] = [];
@@ -22,7 +21,7 @@ export const obtenerTodasLasNoticias = async (palabra: string): Promise<News[]> 
     return listaNoticias;
 }
 
-export const buscarNoticiasPorPalabra = async (palabra: string) => {
+export const buscarNoticiasPorPalabra = async (palabra: string): Promise<News[]> => {
 
     let listaNoticias: News[] = [];
 

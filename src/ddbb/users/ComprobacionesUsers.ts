@@ -1,5 +1,7 @@
 import Usuarios from "../../models/mongoose/Usuarios";
 import {UserComplete} from "../../models/interfaces/User";
+import {Login} from "../../models/interfaces/Login";
+import {auth} from "../../index";
 
 //Comprueba que el alias no está cogido
 export const compruebaUser = async (user: string): Promise<boolean> => {
@@ -27,4 +29,18 @@ export const compruebaEmail = async (email: string): Promise<boolean> => {
         }
     });
     return esta;
+}
+
+//Comprueba que el usuario existe
+export const compruebaLogin = async (data: Login) : Promise<boolean> =>  {
+
+    let error = false;
+
+    await auth.signInWithEmailAndPassword(data.email, data.password).catch(function (e) {
+        error = true;
+    });
+
+    await auth.signOut();
+
+    return error;
 }

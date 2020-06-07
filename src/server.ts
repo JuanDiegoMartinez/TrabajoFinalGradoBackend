@@ -31,8 +31,8 @@ const user = require("./routes/users/RoutesUsers");
 app.use('/user', user);
 const news = require("./routes/news/RoutesNews");
 app.use('/news', news);
-//const videogames = require("./routes/videogames/RoutesVideogames");
-//app.use("/videogames", videogames);
+const videogames = require("./routes/videogames/RoutesVideogames");
+app.use("/videogames", videogames);
 const cookies = require("./routes/cookies/RoutesCookies");
 app.use("/cookies", cookies);
 
