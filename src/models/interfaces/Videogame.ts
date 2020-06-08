@@ -25,5 +25,6 @@ export interface PartialVideogame {
     name: string,
     lanzamiento: string,
     platforms: string[],
-    urlImage: string
+    urlImage: string,
+    slug: string
 }

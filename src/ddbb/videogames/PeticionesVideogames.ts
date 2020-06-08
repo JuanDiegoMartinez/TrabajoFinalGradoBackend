@@ -1,13 +1,13 @@
 import {PartialVideogame, Videogame} from "../../models/interfaces/Videogame";
 import Videojuegos from "../../models/mongoose/Videojuegos";
 
-export const obtenerTodosLosVideojuegos = async (palabra: string): Promise<PartialVideogame[]> => {
+export const obtenerTodosLosVideojuegos = async (palabra: string | undefined, pestanaActual: number | undefined, seleccionado: string | undefined): Promise<PartialVideogame[]> => {
 
     let listaVideojuegos: PartialVideogame[] = [];
 
-    if (palabra !== "" && palabra !== undefined) {
+    if ( (palabra !== undefined) || (pestanaActual !== undefined && seleccionado !== undefined)) {
 
-        listaVideojuegos = await buscarVideojuegosPorPalabra(palabra)
+        listaVideojuegos = await buscarVideojuegosPorPalabra(palabra, pestanaActual, seleccionado)
     }
 
     else {
@@ -16,24 +16,18 @@ export const obtenerTodosLosVideojuegos = async (palabra: string): Promise<Parti
 
             videojuegos.forEach((videojuego: Videogame) => {
 
-                listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage});
+                listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
             })
         })
     }
-
     return listaVideojuegos;
 }
 
-export const buscarVideojuegosPorPalabra = async (palabra: string): Promise<PartialVideogame[]> => {
+export const buscarVideojuegosPorPalabra = async (palabra: string | undefined, pestanaActual: number | undefined, seleccionado: string | undefined): Promise<PartialVideogame[]> => {
 
     let listaVideojuegos: PartialVideogame[] = [];
 
-    if (palabra === "" || palabra === undefined) {
-
-        listaVideojuegos = await obtenerTodosLosVideojuegos("");
-    }
-
-    else {
+    if (palabra !== undefined) {
 
         let palabraMinusculas = palabra.toLowerCase();
         let arrayPalabra = palabraMinusculas.split(' ');
@@ -50,10 +44,68 @@ export const buscarVideojuegosPorPalabra = async (palabra: string): Promise<Part
 
             videojuegos.forEach((videojuego: Videogame) => {
 
-                listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage});
+                listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
             })
         });
     }
 
+    else if (pestanaActual !== undefined && seleccionado !== undefined) {
+
+        //Géneros
+        if (pestanaActual === 0) {
+
+            await Videojuegos.find({genres: {$in: seleccionado } }, (err: any, videojuegos: Videogame[]) => {
+
+                videojuegos.forEach((videojuego: Videogame) => {
+
+                    listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
+                })
+            })
+        }
+
+        //Plataformas
+        else if (pestanaActual === 1) {
+
+            await Videojuegos.find({platforms: {$in: seleccionado } }, (err: any, videojuegos: Videogame[]) => {
+
+                videojuegos.forEach((videojuego: Videogame) => {
+
+                    listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
+                })
+            })
+        }
+
+        //Desarrolladores
+        else {
+
+            await Videojuegos.find({developers: {$in: seleccionado } }, (err: any, videojuegos: Videogame[]) => {
+
+                videojuegos.forEach((videojuego: Videogame) => {
+
+                    listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
+                })
+            })
+        }
+
+    }
+
+    else {
+
+        listaVideojuegos = await obtenerTodosLosVideojuegos(undefined, undefined, undefined)
+
+    }
     return listaVideojuegos;
 }
+
+export const obtenerVideojuego = async (slug: string): Promise<Videogame | undefined> => {
+
+    let videojuego: Videogame | undefined = undefined;
+
+    await Videojuegos.find({slug: { $regex: slug } }, (err: any, videojuegos: Videogame[]) => {
+
+        videojuego = videojuegos[0];
+    });
+
+    return videojuego;
+}
+
