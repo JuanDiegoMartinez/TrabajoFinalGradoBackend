@@ -1,5 +1,7 @@
 import {PartialVideogame, Videogame} from "../../models/interfaces/Videogame";
 import Videojuegos from "../../models/mongoose/Videojuegos";
+import {Valoracion} from "../../models/interfaces/Valoracion";
+import Valoraciones from "../../models/mongoose/Valoraciones";
 
 export const obtenerTodosLosVideojuegos = async (palabra: string | undefined, pestanaActual: number | undefined, seleccionado: string | undefined): Promise<PartialVideogame[]> => {
 
@@ -97,15 +99,21 @@ export const buscarVideojuegosPorPalabra = async (palabra: string | undefined, p
     return listaVideojuegos;
 }
 
-export const obtenerVideojuego = async (slug: string): Promise<Videogame | undefined> => {
+export const obtenerVideojuego = async (slug: string): Promise<any> => {
 
     let videojuego: Videogame | undefined = undefined;
+    let valoraciones: Valoracion[] | undefined = undefined;
 
     await Videojuegos.find({slug: { $regex: slug } }, (err: any, videojuegos: Videogame[]) => {
 
         videojuego = videojuegos[0];
     });
 
-    return videojuego;
+    await Valoraciones.find({slug: { $regex: slug } }, (err: any, valoracions: Valoracion[]) => {
+
+        valoraciones = valoracions;
+    });
+
+    return {videojuego, valoraciones};
 }
 
