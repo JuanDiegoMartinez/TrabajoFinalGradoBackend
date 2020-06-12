@@ -1,8 +1,8 @@
 import express from "express";
 import {app} from '../../server';
 import {
-    buscarVideojuegosPorPalabra,
-    obtenerTodosLosVideojuegos,
+    buscarVideojuegosPorPalabra, nuevoComentario,
+    obtenerTodosLosVideojuegos, obtenerValoraciones,
     obtenerVideojuego
 } from "../../ddbb/videogames/PeticionesVideogames";
 
@@ -69,11 +69,25 @@ app.post("/busquedaVideojuegos", async (req: express.Request, res: express.Respo
     res.send(object);
 })
 
-//Obtener los datos de un videojuego
+//Obtener los datos de un videojuego y sus valoraciones
 app.post("/obtenerVideojuego", async (req: express.Request, res: express.Response): Promise<void> => {
 
     const respuesta = await obtenerVideojuego(req.body.slug);
-    res.send(respuesta);
+    res.send(respuesta).json;
+})
+
+//Obtener las valoraciones de un juego
+app.post("/obtenerValoraciones", async (req: express.Request, res: express.Response): Promise<void> => {
+
+    const respuesta = await obtenerValoraciones(req.body.slug);
+    res.send(respuesta).json;
+})
+
+//Nuevo comentario
+app.post("/newComment", async (req: express.Request, res: express.Response): Promise<any> => {
+
+    const respuesta = await nuevoComentario(req.body);
+    res.send(respuesta).json;
 })
 
 //Hay que importarlo

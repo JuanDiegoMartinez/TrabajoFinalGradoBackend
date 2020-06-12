@@ -12,11 +12,6 @@ app.listen(app.get('port'), () => {
    console.log("Servidor en el puerto ", app.get('port'));
 });
 
-// Handles any requests that don't match the ones above
-app.get('*', (req: any,res: any) =>{
-   res.sendFile(path.join(__dirname+'/client/build/index.html'));
-});
-
 /////////////////////////////////////////////////////////////////////////////////////////////
 //Al utilizar el comando tsc en consola te crea una carpeta(en mi caso build) con el código javascript traducido
 

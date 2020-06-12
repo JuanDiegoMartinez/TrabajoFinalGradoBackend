@@ -1,4 +1,4 @@
-export interface Valoracion {
+export interface Comment {
     user: string,
     image: string,
     slug: string,

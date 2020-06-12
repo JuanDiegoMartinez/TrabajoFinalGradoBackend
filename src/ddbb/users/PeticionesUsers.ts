@@ -3,6 +3,8 @@ import {compruebaEmail, compruebaUser} from "./ComprobacionesUsers";
 import {auth} from "../../index";
 import Usuarios from "../../models/mongoose/Usuarios";
 import {Login} from "../../models/interfaces/Login";
+import {Valoracion} from "../../models/interfaces/Valoracion";
+import Valoraciones from "../../models/mongoose/Valoraciones";
 
 //Comprueba que el alias y email del usuario no estén cogidos
 export const compruebaAliasyEmail = async (alias: string, email: string): Promise<{estaAlias: boolean, estaEmail: boolean}> => {
@@ -20,9 +22,9 @@ export const addUser = async (data: UserRegister): Promise<boolean> => {
 
     await auth.createUserWithEmailAndPassword(data.email, data.password);
     data.password = "******";
-    let user: UserComplete = {...data, rutaImagen: "", juegosFavoritos: [], websFavoritas: []};
+    let user: UserComplete = {...data, rutaImagen: "/broken-image.jpg", juegosFavoritos: [], websFavoritas: []};
     let nuevoUsuario = new Usuarios(user);
-    await nuevoUsuario.save();
+    const a = await nuevoUsuario.save();
     return true;
 };
 
@@ -31,16 +33,37 @@ export const login = async (data: Login): Promise<any> => {
 
     let error = false;
     let user = undefined;
+    let imagen = undefined;
 
-    await auth.signInWithEmailAndPassword(data.email, data.password).catch(function (e) {
+    const a = await auth.signInWithEmailAndPassword(data.email, data.password).catch(function (e) {
         error = true;
     });
 
     if (!error) {
 
-        await Usuarios.find({email: data.email}, (err: any, usuarios: UserComplete[]) => {
+        const b = await Usuarios.find({email: data.email}, (err: any, usuarios: UserComplete[]) => {
             user = usuarios[0].user;
+            imagen = usuarios[0].rutaImagen;
         });
     }
-    return user;
+    return {user, imagen};
+}
+
+//Obtener los datos y comentarios del usuario
+export const obtenerDatosUsuario = async (usuario: string): Promise<any> => {
+
+    const datosUsuario = await Usuarios.find({user: usuario}, (err: any, usuarios: UserComplete[]) => {
+        return usuarios;
+    });
+
+    const valoraciones = await Valoraciones.find({user: { $eq: usuario } }, (err: any, valoracions: Valoracion[]) => {
+        return valoracions;
+    });
+
+    let UserData  = {
+        user: datosUsuario[0],
+        comentarios: valoraciones
+    }
+
+    return UserData;
 }

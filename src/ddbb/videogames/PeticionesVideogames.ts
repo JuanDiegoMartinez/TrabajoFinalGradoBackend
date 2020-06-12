@@ -2,6 +2,7 @@ import {PartialVideogame, Videogame} from "../../models/interfaces/Videogame";
 import Videojuegos from "../../models/mongoose/Videojuegos";
 import {Valoracion} from "../../models/interfaces/Valoracion";
 import Valoraciones from "../../models/mongoose/Valoraciones";
+import Usuarios from "../../models/mongoose/Usuarios";
 
 export const obtenerTodosLosVideojuegos = async (palabra: string | undefined, pestanaActual: number | undefined, seleccionado: string | undefined): Promise<PartialVideogame[]> => {
 
@@ -14,13 +15,19 @@ export const obtenerTodosLosVideojuegos = async (palabra: string | undefined, pe
 
     else {
 
-        await Videojuegos.find({}, (err: any, videojuegos: Videogame[]) => {
+        const a = await Videojuegos.find({}, (err: any, videojuegos: Videogame[]) => {
+
+            let lista: PartialVideogame[] = [];
 
             videojuegos.forEach((videojuego: Videogame) => {
 
                 listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
             })
+
+            return lista;
         })
+        // @ts-ignore
+        return a;
     }
     return listaVideojuegos;
 }
@@ -101,19 +108,32 @@ export const buscarVideojuegosPorPalabra = async (palabra: string | undefined, p
 
 export const obtenerVideojuego = async (slug: string): Promise<any> => {
 
-    let videojuego: Videogame | undefined = undefined;
-    let valoraciones: Valoracion[] | undefined = undefined;
+    const videojuego = await Videojuegos.find({slug: { $eq: slug } }, (err: any, videojuegos: Videogame[]) => {
 
-    await Videojuegos.find({slug: { $regex: slug } }, (err: any, videojuegos: Videogame[]) => {
-
-        videojuego = videojuegos[0];
+        return videojuegos;
     });
 
-    await Valoraciones.find({slug: { $regex: slug } }, (err: any, valoracions: Valoracion[]) => {
+    const valoraciones = await Valoraciones.find({slug: { $eq: slug } }, (err: any, valoracions: Valoracion[]) => {
 
-        valoraciones = valoracions;
+        return valoracions;
     });
 
     return {videojuego, valoraciones};
+}
+
+export const obtenerValoraciones = async (slug: string): Promise<any> => {
+
+    const valoraciones = await Valoraciones.find({slug: { $eq: slug } }, (err: any, valoracions: Valoracion[]) => {
+
+        return valoracions;
+    });
+
+    return valoraciones;
+}
+
+export const nuevoComentario = async (datos: Comment): Promise<boolean> => {
+    let nuevoComentario = new Valoraciones(datos);
+    await nuevoComentario.save();
+    return true;
 }
 

@@ -1,6 +1,6 @@
 import express from 'express';
 import {app} from '../../server';
-import {addUser, compruebaAliasyEmail, login} from "../../ddbb/users/PeticionesUsers";
+import {addUser, compruebaAliasyEmail, login, obtenerDatosUsuario} from "../../ddbb/users/PeticionesUsers";
 import {compruebaLogin} from "../../ddbb/users/ComprobacionesUsers";
 
 //Obtenemos el express.Router() que es un middleware que sirve de direccionador de routes
@@ -24,9 +24,13 @@ app.post("/login", async (req: express.Request, res: express.Response) : Promise
     const respuesta = await login(req.body);
 
     // @ts-ignore
-    req.session.user = respuesta;
+    req.session.user = respuesta.user;
 
-    res.send(respuesta);
+    // @ts-ignore
+    req.session.imagen = respuesta.imagen;
+
+    // @ts-ignore
+    res.send(req.session.user);
 });
 
 //Recibe un Login para comprobar el login
@@ -35,10 +39,26 @@ app.post("/compruebaLogin", async (req: express.Request, res: express.Response) 
     res.send(respuesta);
 })
 
-//Obtener la sesion del usuario
+//Obtener la sesion del usuario para que se vea en el navbar
 app.get("/session", async (req: express.Request, res: express.Response) : Promise<any> => {
     // @ts-ignore
-    res.send(req.session.user);
+    res.send({user: req.session.user, imagen: req.session.imagen});
+});
+
+//Obtener los datos del usuario para modificar
+app.get("/obtenerDatosUsuario", async (req: express.Request, res: express.Response) : Promise<any> => {
+
+
+    // @ts-ignore
+    if (req.session.user !== undefined) {
+        // @ts-ignore
+        const respuesta = await obtenerDatosUsuario(req.session.user);
+        res.send(respuesta);
+    }
+    else {
+        res.send({user: {}, comentarios: [] });
+    }
+
 });
 
 
