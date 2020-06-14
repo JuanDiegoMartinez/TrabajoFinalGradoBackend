@@ -45,9 +45,20 @@ app.get("/session", async (req: express.Request, res: express.Response) : Promis
     res.send({user: req.session.user, imagen: req.session.imagen});
 });
 
+//Cerrar la sesion del usuario
+app.get("/cerrarSession", async (req: express.Request, res: express.Response) : Promise<any> => {
+
+    // @ts-ignore
+    req.session.user = undefined;
+    // @ts-ignore
+    req.session.imagen = undefined;
+
+    // @ts-ignore
+    res.send({user: req.session.user, imagen: req.session.imagen});
+});
+
 //Obtener los datos del usuario para modificar
 app.get("/obtenerDatosUsuario", async (req: express.Request, res: express.Response) : Promise<any> => {
-
 
     // @ts-ignore
     if (req.session.user !== undefined) {

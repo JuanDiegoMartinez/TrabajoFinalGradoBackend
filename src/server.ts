@@ -24,7 +24,6 @@ app.use(session({
 
 // Routes (Para que se puedan utilizar las routes en otros archivos)
 //Le digo a express que hay rutas en ese archivo para que las use (app.use puedes poner la ruta que quieras)
-
 const peticionesUnicas = require("./peticionesUnicas");
 app.use("/", peticionesUnicas);
 const user = require("./routes/users/RoutesUsers");
@@ -35,5 +34,11 @@ const videogames = require("./routes/videogames/RoutesVideogames");
 app.use("/videogames", videogames);
 const cookies = require("./routes/cookies/RoutesCookies");
 app.use("/cookies", cookies);
+const genres = require("./routes/genres/RoutesGenres");
+app.use("/genres", genres);
+const publishers = require("./routes/publishers/RoutesPublishers");
+app.use("/publishers", publishers);
+const webs = require("./routes/webs/RoutesWebs");
+app.use("/webs", webs);
 
 
