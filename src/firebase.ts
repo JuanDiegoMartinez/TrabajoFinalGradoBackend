@@ -1,7 +1,15 @@
 import firebase from "firebase/app";
+import * as admin from 'firebase-admin';
 
 //Para habilitar toda la configuración de auth
 import "firebase/auth";
+
+const serviceAccount = require('C:\\Users\\JD\\Desktop\\GitHub\\TrabajoFinalGradoBackend\\src\\basedatosfinal-495d6-c575930a61a7.json');
+
+export const admon = admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://basedatosfinal-495d6.firebaseio.com'
+});
 
 // Your web app's Firebase configuration
 const firebaseConfig = {

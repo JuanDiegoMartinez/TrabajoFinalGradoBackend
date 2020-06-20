@@ -1,7 +1,14 @@
 import express from 'express';
 import {app} from '../../server';
-import {addUser, compruebaAliasyEmail, login, obtenerDatosUsuario} from "../../ddbb/users/PeticionesUsers";
+import {
+    addUser,
+    compruebaAliasyEmail,
+    cambiarDatosUsuario,
+    login,
+    obtenerDatosUsuario, cambiarImagen, cambiarComentarios
+} from "../../ddbb/users/PeticionesUsers";
 import {compruebaLogin} from "../../ddbb/users/ComprobacionesUsers";
+import {auth} from "../../index";
 
 //Obtenemos el express.Router() que es un middleware que sirve de direccionador de routes
 const router = express.Router();
@@ -53,6 +60,8 @@ app.get("/cerrarSession", async (req: express.Request, res: express.Response) : 
     // @ts-ignore
     req.session.imagen = undefined;
 
+    await auth.signOut();
+
     // @ts-ignore
     res.send({user: req.session.user, imagen: req.session.imagen});
 });
@@ -72,28 +81,31 @@ app.get("/obtenerDatosUsuario", async (req: express.Request, res: express.Respon
 
 });
 
-
-
-app.post("/imagen2", async (req: express.Request, res: express.Response): Promise<any> => {
-
+//Obtener los datos del usuario para modificar
+app.post("/cambiarDatosUsuario", async (req: express.Request, res: express.Response) : Promise<any> => {
     // @ts-ignore
-    console.log("soy la putisima imagen: ", req.files.pic);
-
-    // @ts-ignore
-    const imagen = req.files.pic;
-
-    const camino = "C:\\Users\\JD\\Desktop\\GitHub\\TrabajoFinalGrado\\src\\res\\img\\imagen2.png";
-
-    //const a = "C:\\Users\\JD\\Desktop\\GitHub\\TrabajoFinalGradoBackend\\src\\imagenes\\imagen2.png";
-
-    // @ts-ignore
-    imagen.mv(camino, function(err: any) {
-        if (err)
-            return res.status(500).send(err);
-
-        res.send(camino);
-    });
+    const respuesta = await cambiarDatosUsuario(req.body);
+    res.send(respuesta);
 });
+
+//Cambiar la imagen del usuario
+app.post("/cambiarImagen", async (req: express.Request, res: express.Response) : Promise<any> => {
+    // @ts-ignore
+    const respuesta = await cambiarImagen(req.body.url, req.session.user);
+    res.send(respuesta);
+});
+
+//Cambiar los comentarios del usuario
+app.post("/cambiarComentarios", async (req: express.Request, res: express.Response) : Promise<any> => {
+    // @ts-ignore
+    const respuesta = await cambiarComentarios(req.body, req.session.user);
+    res.send(respuesta);
+});
+
+// Recuperar la password del usuario
+app.post("/recuperarPassword", async (req: express.Request, res: express.Response) : Promise<any> => {
+    await auth.sendPasswordResetEmail(req.body.email).catch((err: any) => {console.log(err)});
+})
 
 //Hay que importarlo
 module.exports = router;

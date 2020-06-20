@@ -5,6 +5,7 @@ import Usuarios from "../../models/mongoose/Usuarios";
 import {Login} from "../../models/interfaces/Login";
 import {Valoracion} from "../../models/interfaces/Valoracion";
 import Valoraciones from "../../models/mongoose/Valoraciones";
+import {admon} from "../../firebase";
 
 //Comprueba que el alias y email del usuario no estén cogidos
 export const compruebaAliasyEmail = async (alias: string, email: string): Promise<{estaAlias: boolean, estaEmail: boolean}> => {
@@ -21,8 +22,8 @@ export const compruebaAliasyEmail = async (alias: string, email: string): Promis
 export const addUser = async (data: UserRegister): Promise<boolean> => {
 
     await auth.createUserWithEmailAndPassword(data.email, data.password);
-    data.password = "******";
-    let user: UserComplete = {...data, rutaImagen: "/broken-image.jpg", juegosFavoritos: [], websFavoritas: []};
+    const imagenDefecto = "https://firebasestorage.googleapis.com/v0/b/basedatosfinal-495d6.appspot.com/o/default-user-image.png?alt=media&token=76b0f93c-32a1-4975-bd1c-a0cc4904a863";
+    let user: UserComplete = {...data, rutaImagen: imagenDefecto, juegosFavoritos: [], websFavoritas: []};
     let nuevoUsuario = new Usuarios(user);
     const a = await nuevoUsuario.save();
     return true;
@@ -66,4 +67,47 @@ export const obtenerDatosUsuario = async (usuario: string): Promise<any> => {
     }
 
     return UserData;
+}
+
+//Modificar los datos del usuario
+export const cambiarDatosUsuario = async (datosUsuario: UserComplete): Promise<any> => {
+
+    const userData = await Usuarios.updateOne({user: datosUsuario.user}, {$set: {email: datosUsuario.email, nombre: datosUsuario.nombre, password: datosUsuario.password,
+    nacimiento: datosUsuario.nacimiento}});
+
+    const valoraciones = await Valoraciones.find({user: { $eq: datosUsuario.user } }, (err: any, valoracions: Valoracion[]) => {
+        return valoracions;
+    });
+
+    let UserData  = {
+        user: datosUsuario,
+        comentarios: valoraciones
+    }
+
+    // @ts-ignore
+    await admon.auth().deleteUser(auth.currentUser.uid).catch((err: any) => {console.log(err)});
+    await auth.createUserWithEmailAndPassword(datosUsuario.email, datosUsuario.password).catch((err: any) => {console.log(err)});
+    await auth.signInWithEmailAndPassword(datosUsuario.email, datosUsuario.password);
+
+    return UserData;
+}
+
+//Modificar la imagen del usuario
+export const cambiarImagen = async (url: string, usuario: string): Promise<any> => {
+
+    const userData = await Usuarios.updateOne({user: usuario}, {$set: {rutaImagen: url}});
+
+    const a = await Valoraciones.updateMany({user: usuario}, {$set: {image: url}});
+
+    return url;
+}
+
+//Modificar los comentarios del usuario
+export const cambiarComentarios = async (comentarios: Valoracion[], usuario: string): Promise<any> => {
+
+    comentarios.forEach( async (comentario: Valoracion) => {
+        await Valoraciones.updateOne({user: usuario, slug: comentario.slug}, {$set: {comment: comentario.comment, rating: comentario.rating}})
+    })
+
+    return comentarios;
 }

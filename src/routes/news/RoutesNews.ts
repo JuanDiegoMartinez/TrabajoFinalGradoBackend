@@ -33,11 +33,13 @@ app.post("/busquedaNoticias", async (req: express.Request, res: express.Response
 
     // @ts-ignore
     req.session.palabra = req.body.palabra;
+    //@ts-ignore
+    req.session.page = 0;
 
     // @ts-ignore
     const palabra = req.session.palabra;
     // @ts-ignore
-    const page = req.session.page;
+    const page = 0;
     // @ts-ignore
     const rowsPerPage = req.session.rowsPerPage;
 

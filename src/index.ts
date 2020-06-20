@@ -1,5 +1,4 @@
 import {inicializarFirebase} from "./firebase";
-import * as path from "path";
 import {app} from './server';
 
 require("./database");
