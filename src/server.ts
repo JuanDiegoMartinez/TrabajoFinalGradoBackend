@@ -18,7 +18,7 @@ app.use(fileUpload());
 //Para utilizar sesiones
 app.use(session({
     secret: 'secreto',
-    resave: true,
+    resave: false,
     saveUninitialized: true,
 }));
 

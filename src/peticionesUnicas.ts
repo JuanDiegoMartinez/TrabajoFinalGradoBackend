@@ -47,6 +47,7 @@ const obtenerNoticiasApi = async (): Promise<void> => {
             let noticia: News = {
                 author: articulo.author,
                 title: articulo.title,
+                slug: "",
                 description: articulo.description,
                 urlNews: articulo.url,
                 urlImage: articulo.urlToImage,
@@ -58,8 +59,6 @@ const obtenerNoticiasApi = async (): Promise<void> => {
             let texto = JSON.parse(stdout);
 
             if (texto.text !== "") {
-
-                console.log("En el if");
 
                 if (articulo.author === null) {
                     noticia.author = "Anónimo"
@@ -74,6 +73,19 @@ const obtenerNoticiasApi = async (): Promise<void> => {
                         contenidoNoticia += elem + "<br/><br/>";
                     }
                 })
+
+                let palabraMinusculas = articulo.title.toLowerCase();
+                let arrayPalabra = palabraMinusculas.split(' ');
+
+                let palabraSlug = "";
+
+                for (let i = 0; i < arrayPalabra.length - 1; i++) {
+                    palabraSlug += arrayPalabra[i] + "-";
+                }
+
+                palabraSlug += arrayPalabra[arrayPalabra.length - 1];
+
+                noticia.slug = palabraSlug;
 
                 noticia.content = contenidoNoticia;
 

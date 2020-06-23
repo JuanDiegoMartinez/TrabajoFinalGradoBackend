@@ -1,6 +1,7 @@
 import express from "express";
 import {app} from '../../server';
-import {buscarNoticiasPorPalabra, obtenerTodasLasNoticias} from "../../ddbb/news/PeticionesNews";
+import {buscarNoticiasPorPalabra, obtenerNoticia, obtenerTodasLasNoticias} from "../../ddbb/news/PeticionesNews";
+import {obtenerVideojuego} from "../../ddbb/videogames/PeticionesVideogames";
 
 //Obtenemos el express.Router() que es un middleware que sirve de direccionador de routes
 const router = express.Router();
@@ -56,6 +57,13 @@ app.post("/busquedaNoticias", async (req: express.Request, res: express.Response
     }
 
     res.send(object);
+})
+
+//Obtener los datos de una noticia
+app.post("/obtenerNoticia", async (req: express.Request, res: express.Response): Promise<void> => {
+
+    const respuesta = await obtenerNoticia(req.body.slug);
+    res.send(respuesta).json;
 })
 
 //Hay que importarlo

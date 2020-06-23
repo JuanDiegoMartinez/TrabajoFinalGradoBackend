@@ -26,12 +26,116 @@ app.post("/cookieRowsPerPage", async (req: express.Request, res: express.Respons
     });
 })
 
-app.post("/cookiePalabra", async (req: express.Request, res: express.Response): Promise<void> => {
+app.post("/eliminarCookieNoticias", async (req: express.Request, res: express.Response): Promise<void> => {
 
-    console.log("Estoy en /cookiePalabra, soy la palabra: ", req.body.palabra);
     // @ts-ignore
-    req.session.palabra = req.body.palabra;
+    req.session.rowsPerPage = undefined;
+    // @ts-ignore
+    req.session.page = undefined;
+    // @ts-ignore
+    req.session.palabra = undefined;
+
+    // @ts-ignore
+    await req.session.save(function (err) {
+    });
+
+    res.send("cookies noticias eliminadas")
 })
+
+app.post("/eliminarCookieVideojuegos", async (req: express.Request, res: express.Response): Promise<void> => {
+
+    // @ts-ignore
+    req.session.pestanaActual = undefined;
+    // @ts-ignore
+    req.session.seleccionado = undefined;
+    // @ts-ignore
+    req.session.palabraJuegos = undefined;
+
+    // @ts-ignore
+    await req.session.save(function (err) {});
+
+    res.send("cookies videojuegos eliminadas")
+})
+
+app.post("/eliminarTodasLasCookies", async (req: express.Request, res: express.Response): Promise<void> => {
+
+    if (req.body.nombre === "noticias") {
+        // @ts-ignore
+        req.session.pestanaActual = undefined;
+        // @ts-ignore
+        req.session.seleccionado = undefined;
+        // @ts-ignore
+        req.session.palabraJuegos = undefined;
+        // @ts-ignore
+        req.session.pageWebs = undefined;
+        // @ts-ignore
+        req.session.seleccionadoWebs = undefined;
+        // @ts-ignore
+        req.session.rowsPerPageWebs = undefined;
+        // @ts-ignore
+        await req.session.save(function (err) {});
+    }
+
+    else if (req.body.nombre === "videojuegos" ) {
+        // @ts-ignore
+        req.session.rowsPerPage = undefined;
+        // @ts-ignore
+        req.session.page = undefined;
+        // @ts-ignore
+        req.session.palabra = undefined;
+        // @ts-ignore
+        req.session.pageWebs = undefined;
+        // @ts-ignore
+        req.session.seleccionadoWebs = undefined;
+        // @ts-ignore
+        req.session.rowsPerPageWebs = undefined;
+        // @ts-ignore
+        await req.session.save(function (err) {});
+    }
+
+    else if (req.body.nombre === "webs") {
+        // @ts-ignore
+        req.session.rowsPerPage = undefined;
+        // @ts-ignore
+        req.session.page = undefined;
+        // @ts-ignore
+        req.session.palabra = undefined;
+        // @ts-ignore
+        req.session.pestanaActual = undefined;
+        // @ts-ignore
+        req.session.seleccionado = undefined;
+        // @ts-ignore
+        req.session.palabraJuegos = undefined;
+        // @ts-ignore
+        await req.session.save(function (err) {});
+    }
+
+    else {
+        // @ts-ignore
+        req.session.pestanaActual = undefined;
+        // @ts-ignore
+        req.session.seleccionado = undefined;
+        // @ts-ignore
+        req.session.palabraJuegos = undefined;
+        // @ts-ignore
+        req.session.pageWebs = undefined;
+        // @ts-ignore
+        req.session.seleccionadoWebs = undefined;
+        // @ts-ignore
+        req.session.rowsPerPageWebs = undefined;
+        // @ts-ignore
+        req.session.rowsPerPage = undefined;
+        // @ts-ignore
+        req.session.page = undefined;
+        // @ts-ignore
+        req.session.palabra = undefined;
+        // @ts-ignore
+        await req.session.save(function (err) {});
+    }
+
+    res.send("cookies eliminadas")
+})
+
 
 //Hay que importarlo
 module.exports = router;
