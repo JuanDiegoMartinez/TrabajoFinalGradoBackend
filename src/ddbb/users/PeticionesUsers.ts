@@ -23,7 +23,26 @@ export const addUser = async (data: UserRegister): Promise<boolean> => {
 
     await auth.createUserWithEmailAndPassword(data.email, data.password);
     const imagenDefecto = "https://firebasestorage.googleapis.com/v0/b/basedatosfinal-495d6.appspot.com/o/default-user-image.png?alt=media&token=76b0f93c-32a1-4975-bd1c-a0cc4904a863";
-    let user: UserComplete = {...data, rutaImagen: imagenDefecto, juegosFavoritos: [], websFavoritas: []};
+
+    const juegosFavoritos = [{
+        name: "Juegos Favoritos",
+        id: "Juegos Favoritos",
+        thumbnailUrl: null,
+        isDir: true,
+        childrenIds: [],
+        parentId: null
+    }]
+
+    const websFavoritas = [{
+        name: "Webs Favoritas",
+        id: "Webs Favoritas",
+        thumbnailUrl: null,
+        isDir: true,
+        childrenIds: [],
+        parentId: null
+    }]
+
+    let user: UserComplete = {...data, rutaImagen: imagenDefecto, juegosFavoritos, websFavoritas};
     let nuevoUsuario = new Usuarios(user);
     const a = await nuevoUsuario.save();
     return true;
@@ -35,6 +54,8 @@ export const login = async (data: Login): Promise<any> => {
     let error = false;
     let user = undefined;
     let imagen = undefined;
+    let juegosFavoritos = undefined;
+    let websFavoritas = undefined;
 
     const a = await auth.signInWithEmailAndPassword(data.email, data.password).catch(function (e) {
         error = true;
@@ -45,9 +66,11 @@ export const login = async (data: Login): Promise<any> => {
         const b = await Usuarios.find({email: data.email}, (err: any, usuarios: UserComplete[]) => {
             user = usuarios[0].user;
             imagen = usuarios[0].rutaImagen;
+            juegosFavoritos = usuarios[0].juegosFavoritos;
+            websFavoritas = usuarios[0].websFavoritas;
         });
     }
-    return {user, imagen};
+    return {user, imagen, juegosFavoritos, websFavoritas};
 }
 
 //Obtener los datos y comentarios del usuario
@@ -110,4 +133,20 @@ export const cambiarComentarios = async (comentarios: Valoracion[], usuario: str
     })
 
     return comentarios;
+}
+
+//Obtener los favoritos del usuario
+export const obtenerFavoritos = async (usuario: string): Promise<any> => {
+
+    const datosUsuario = await Usuarios.find({user: usuario}, (err: any, usuarios: UserComplete[]) => {
+        return usuarios;
+    });
+
+    return datosUsuario;
+}
+
+//Modificar los juegos favoritos
+export const modificarJuegosFavoritos = async (usuario: string, listaJuegos: any[]) => {
+
+    const datosUsuario = await Usuarios.updateOne({user: usuario}, {$set: {juegosFavoritos: listaJuegos}});
 }

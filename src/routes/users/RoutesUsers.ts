@@ -5,7 +5,7 @@ import {
     compruebaAliasyEmail,
     cambiarDatosUsuario,
     login,
-    obtenerDatosUsuario, cambiarImagen, cambiarComentarios
+    obtenerDatosUsuario, cambiarImagen, cambiarComentarios, obtenerFavoritos, modificarJuegosFavoritos
 } from "../../ddbb/users/PeticionesUsers";
 import {compruebaLogin} from "../../ddbb/users/ComprobacionesUsers";
 import {auth} from "../../index";
@@ -37,7 +37,7 @@ app.post("/login", async (req: express.Request, res: express.Response) : Promise
     req.session.imagen = respuesta.imagen;
 
     // @ts-ignore
-    res.send(req.session.user);
+    res.send({user: req.session.user, imagen: req.session.imagen, juegosFavoritos: respuesta.juegosFavoritos, websFavoritas: respuesta.websFavoritas});
 });
 
 //Recibe un Login para comprobar el login
@@ -48,8 +48,15 @@ app.post("/compruebaLogin", async (req: express.Request, res: express.Response) 
 
 //Obtener la sesion del usuario para que se vea en el navbar
 app.get("/session", async (req: express.Request, res: express.Response) : Promise<any> => {
+
     // @ts-ignore
-    res.send({user: req.session.user, imagen: req.session.imagen});
+    if (req.session.user !== undefined) {
+        // @ts-ignore
+        const respuesta = await obtenerFavoritos(req.session.user);
+        // @ts-ignore
+        res.send({user: req.session.user, imagen: req.session.imagen, juegosFavoritos: respuesta[0].juegosFavoritos, websFavoritas: respuesta[0].websFavoritas});
+    }
+
 });
 
 //Cerrar la sesion del usuario
@@ -105,6 +112,14 @@ app.post("/cambiarComentarios", async (req: express.Request, res: express.Respon
 // Recuperar la password del usuario
 app.post("/recuperarPassword", async (req: express.Request, res: express.Response) : Promise<any> => {
     await auth.sendPasswordResetEmail(req.body.email).catch((err: any) => {console.log(err)});
+})
+
+// Modificar los juegos favoritos del usuario
+app.post("/modificarJuegosFavoritos", async (req: express.Request, res: express.Response) : Promise<any> => {
+    // @ts-ignore
+    const respuesta = await modificarJuegosFavoritos(req.session.user, req.body);
+
+    res.send("juegos favoritos modificados")
 })
 
 //Hay que importarlo
