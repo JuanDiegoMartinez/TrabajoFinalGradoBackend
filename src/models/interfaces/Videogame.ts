@@ -13,7 +13,8 @@ export interface Videogame {
     clip: string,
     tags: string[],
     screenshots: string[],
-    website: string
+    website: string,
+    publishers: string[]
 }
 
 export interface storeVideogame {

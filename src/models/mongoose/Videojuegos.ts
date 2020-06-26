@@ -15,7 +15,8 @@ const Videojuegos = new Schema({
     clip: {type: String},
     tags: {type: [String]},
     screenshots: {type: [String]},
-    website: {type: String}
+    website: {type: String},
+    publishers: {type: [String]}
     },
     {versionKey: false}
     )

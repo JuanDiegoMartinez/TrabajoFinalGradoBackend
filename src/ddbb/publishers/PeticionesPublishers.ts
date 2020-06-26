@@ -6,16 +6,9 @@ import Editores from "../../models/mongoose/Editores";
 //Obtener todos los editores
 export const obtenerTodosLosEditores = async (): Promise<any> => {
 
-    let listaEditores: PartialPublisher[] = [];
+    const editores = await Editores.find({}, null);
 
-    const editores = await Editores.find({}, (err: any, editores: Publisher[]) => {
-
-        editores.forEach((editor: Publisher) => {
-            listaEditores.push({name: editor.name, urlImage: editor.urlImage})
-        })
-    })
-
-    return listaEditores;
+    return editores;
 }
 
 //Obtener el editor
@@ -30,10 +23,9 @@ export const obtenerEditor = async (editor: string): Promise<any> => {
     let listaJuegos: any[] = [];
 
     // @ts-ignore
-    const juegos = await Videojuegos.find({slug: editores[0].juegos}, (err: any, games: Videogame[]) => {});
+    const juegos = await Videojuegos.find({publishers: {$in: editor } }, null, {limit: 3});
 
-    // @ts-ignore
-    juegos.forEach((juego: Videogame) => {
+    juegos.forEach((juego: any) => {
         listaJuegos.push({name: juego.name, urlImage: juego.urlImage, slug: juego.slug});
     })
 

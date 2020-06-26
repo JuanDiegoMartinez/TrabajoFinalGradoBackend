@@ -6,16 +6,9 @@ import {Videogame} from "../../models/interfaces/Videogame";
 //Obtener todos los generos
 export const obtenerTodosLosGeneros = async (): Promise<any> => {
 
-    let listaGeneros: PartialGenre[] = [];
+    const generos = await Generos.find({}, null)
 
-    const generos = await Generos.find({}, (err: any, generos: Genre[]) => {
-
-        generos.forEach((genero: Genre) => {
-            listaGeneros.push({name: genero.name, urlImage: genero.urlImage})
-        })
-    })
-
-    return listaGeneros;
+    return generos;
 }
 
 //Obtener el género
@@ -30,11 +23,10 @@ export const obtenerGenero = async (genero: string): Promise<any> => {
     let listaJuegos: any[] = [];
 
     // @ts-ignore
-    const juegos = await Videojuegos.find({slug: generos[0].juegos}, (err: any, games: Videogame[]) => {});
+    const juegos = await Videojuegos.find({genres: {$in: genero } }, null, {limit: 3});
 
-    // @ts-ignore
-    juegos.forEach((juego: Videogame) => {
-        listaJuegos.push({name: juego.name, urlImage: juego.urlImage, slug: juego.slug});
+    juegos.forEach((juego: any) => {
+        listaJuegos.push({name: juego.name, urlImage: juego.urlImage, slug: juego.slug})
     })
 
     return {generos, listaJuegos};

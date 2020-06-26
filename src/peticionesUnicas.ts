@@ -163,6 +163,13 @@ const obtenerVideojuegosApi = async (): Promise<void> => {
                 desarrolladores.push(developer.name)
             })
 
+            //Editores
+            let editores: string[] = [];
+
+            data.publishers.forEach((publisher:any) => {
+                editores.push(publisher.name)
+            })
+
             //Generos
             let generos: string[] = [];
 
@@ -209,7 +216,8 @@ const obtenerVideojuegosApi = async (): Promise<void> => {
                 clip: video,
                 tags: etiquetas,
                 screenshots: imagenes,
-                website: data.website
+                website: data.website,
+                publishers: editores
             }
 
             let Videojuego = new Videojuegos(videogame);
