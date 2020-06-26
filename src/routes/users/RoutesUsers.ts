@@ -5,7 +5,12 @@ import {
     compruebaAliasyEmail,
     cambiarDatosUsuario,
     login,
-    obtenerDatosUsuario, cambiarImagen, cambiarComentarios, obtenerFavoritos, modificarJuegosFavoritos
+    obtenerDatosUsuario,
+    cambiarImagen,
+    cambiarComentarios,
+    obtenerFavoritos,
+    modificarJuegosFavoritos,
+    modificarWebsFavoritas
 } from "../../ddbb/users/PeticionesUsers";
 import {compruebaLogin} from "../../ddbb/users/ComprobacionesUsers";
 import {auth} from "../../index";
@@ -54,7 +59,10 @@ app.get("/session", async (req: express.Request, res: express.Response) : Promis
         // @ts-ignore
         const respuesta = await obtenerFavoritos(req.session.user);
         // @ts-ignore
-        res.send({user: req.session.user, imagen: req.session.imagen, juegosFavoritos: respuesta[0].juegosFavoritos, websFavoritas: respuesta[0].websFavoritas});
+        res.send({user: req.session.user, imagen: respuesta[0].rutaImagen, juegosFavoritos: respuesta[0].juegosFavoritos, websFavoritas: respuesta[0].websFavoritas});
+    }
+    else {
+        res.send({});
     }
 
 });
@@ -64,13 +72,11 @@ app.get("/cerrarSession", async (req: express.Request, res: express.Response) : 
 
     // @ts-ignore
     req.session.user = undefined;
-    // @ts-ignore
-    req.session.imagen = undefined;
 
     await auth.signOut();
 
     // @ts-ignore
-    res.send({user: req.session.user, imagen: req.session.imagen});
+    res.send({});
 });
 
 //Obtener los datos del usuario para modificar
@@ -120,6 +126,14 @@ app.post("/modificarJuegosFavoritos", async (req: express.Request, res: express.
     const respuesta = await modificarJuegosFavoritos(req.session.user, req.body);
 
     res.send("juegos favoritos modificados")
+})
+
+// Modificar los juegos favoritos del usuario
+app.post("/modificarWebsFavoritas", async (req: express.Request, res: express.Response) : Promise<any> => {
+    // @ts-ignore
+    const respuesta = await modificarWebsFavoritas(req.session.user, req.body);
+
+    res.send("webs favoritas modificadas")
 })
 
 //Hay que importarlo

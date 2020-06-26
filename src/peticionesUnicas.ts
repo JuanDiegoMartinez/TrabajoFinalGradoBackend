@@ -35,7 +35,7 @@ const obtenerNoticiasApi = async (): Promise<void> => {
     const response = await newsapi.v2.topHeadlines({
         category: 'technology',
         country: 'mx',
-        pageSize: 10
+        pageSize: 100
     })
 
     response.articles.forEach((articulo: any) => {
@@ -110,11 +110,11 @@ const obtenerVideojuegosApi = async (): Promise<void> => {
     })
 
     //Bucle para cambiar la página ya que solo envía 40
-    for (let i = 1; i <= 1; i++) {
+    for (let i = 1; i <= 3; i++) {
 
         const response = await Axios.get("/games", {
             params: {
-                page_size: 10,
+                page_size: 40,
                 page: i
             }
         });
@@ -127,9 +127,9 @@ const obtenerVideojuegosApi = async (): Promise<void> => {
             //Pantallas
             const imagenes: string[] = [];
 
-            juego.short_screenshots.forEach((screen: any) => {
-                imagenes.push(screen.image);
-            })
+            for(let i = 1; i < juego.short_screenshots.length; i++) {
+                imagenes.push(juego.short_screenshots[i].image)
+            }
 
             //Obtenemos el nombre del juego para obtener sus otros datos
             const slug = juego.slug;

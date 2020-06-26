@@ -150,3 +150,9 @@ export const modificarJuegosFavoritos = async (usuario: string, listaJuegos: any
 
     const datosUsuario = await Usuarios.updateOne({user: usuario}, {$set: {juegosFavoritos: listaJuegos}});
 }
+
+//Modificar las webs favoritas
+export const modificarWebsFavoritas = async (usuario: string, listaWebs: any[]) => {
+
+    const datosUsuario = await Usuarios.updateOne({user: usuario}, {$set: {websFavoritas: listaWebs}});
+}
