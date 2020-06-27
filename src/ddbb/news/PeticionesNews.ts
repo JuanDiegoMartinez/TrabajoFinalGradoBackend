@@ -16,13 +16,18 @@ export const obtenerTodasLasNoticias = async (palabra: string): Promise<PartialN
 
     else {
 
-        await Noticias.find({}, (err: any, noticias: News[]) => {
+         const a = await Noticias.find({}, (err: any, noticias: News[]) => {
+
+             let lista: PartialNews[] = [];
 
             noticias.forEach((noticia: News) => {
 
-                listaNoticias.push({title: noticia.title, slug: noticia.slug, description: noticia.description, urlImage: noticia.urlImage});
+                lista.push({title: noticia.title, slug: noticia.slug, description: noticia.description, urlImage: noticia.urlImage});
             })
+             return lista
         })
+        // @ts-ignore
+        return a;
     }
 
     return listaNoticias;
@@ -50,13 +55,18 @@ export const buscarNoticiasPorPalabra = async (palabra: string): Promise<Partial
 
         palabraSlug += arrayPalabra[arrayPalabra.length - 1];
 
-        await Noticias.find({slug: { $regex: '.*' + palabraSlug + '.*' } }, (err: any, noticias: News[]) => {
+        const a = await Noticias.find({slug: { $regex: '.*' + palabraSlug + '.*' } }, (err: any, noticias: News[]) => {
+
+            let lista: PartialNews[] = [];
 
             noticias.forEach((noticia: News) => {
 
-                listaNoticias.push({title: noticia.title, slug: noticia.slug, description: noticia.description, urlImage: noticia.urlImage});
+                lista.push({title: noticia.title, slug: noticia.slug, description: noticia.description, urlImage: noticia.urlImage});
             })
+            return lista;
         });
+        // @ts-ignore
+        return a;
     }
 
     return listaNoticias;
@@ -64,10 +74,7 @@ export const buscarNoticiasPorPalabra = async (palabra: string): Promise<Partial
 
 export const obtenerNoticia = async (slug: string): Promise<any> => {
 
-    const noticia = await Noticias.find({slug: { $regex: '.*' + slug + '.*' } }, (err: any, noticia: News[]) => {
-
-        return noticia;
-    });
+    const noticia = await Noticias.find({slug: { $regex: '.*' + slug + '.*' } }, null);
 
     return {noticia};
 }

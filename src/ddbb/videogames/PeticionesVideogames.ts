@@ -21,7 +21,7 @@ export const obtenerTodosLosVideojuegos = async (palabra: string | undefined, pe
 
             videojuegos.forEach((videojuego: Videogame) => {
 
-                listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
+                lista.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
             })
 
             return lista;
@@ -49,13 +49,18 @@ export const buscarVideojuegosPorPalabra = async (palabra: string | undefined, p
 
         palabraSlug += arrayPalabra[arrayPalabra.length - 1];
 
-        await Videojuegos.find({slug: { $regex: '.*' + palabraSlug + '.*' } }, (err: any, videojuegos: Videogame[]) => {
+        const a = await Videojuegos.find({slug: { $regex: '.*' + palabraSlug + '.*' } }, (err: any, videojuegos: Videogame[]) => {
+
+            let lista: PartialVideogame[] = [];
 
             videojuegos.forEach((videojuego: Videogame) => {
 
-                listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
+                lista.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
             })
+            return lista;
         });
+        // @ts-ignore
+        return a;
     }
 
     else if (pestanaActual !== undefined && seleccionado !== undefined) {
@@ -63,37 +68,52 @@ export const buscarVideojuegosPorPalabra = async (palabra: string | undefined, p
         //Géneros
         if (pestanaActual === 0) {
 
-            await Videojuegos.find({genres: {$in: seleccionado } }, (err: any, videojuegos: Videogame[]) => {
+             const a = await Videojuegos.find({genres: {$in: seleccionado } }, (err: any, videojuegos: Videogame[]) => {
+
+                 let lista: PartialVideogame[] = [];
 
                 videojuegos.forEach((videojuego: Videogame) => {
 
-                    listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
+                    lista.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
                 })
+                 return lista;
             })
+            // @ts-ignore
+            return a;
         }
 
         //Plataformas
         else if (pestanaActual === 1) {
 
-            await Videojuegos.find({platforms: {$in: seleccionado } }, (err: any, videojuegos: Videogame[]) => {
+            const a = await Videojuegos.find({platforms: {$in: seleccionado } }, (err: any, videojuegos: Videogame[]) => {
+
+                let lista: PartialVideogame[] = [];
 
                 videojuegos.forEach((videojuego: Videogame) => {
 
                     listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
                 })
+                return lista;
             })
+            // @ts-ignore
+            return a;
         }
 
         //Desarrolladores
         else {
 
-            await Videojuegos.find({developers: {$in: seleccionado } }, (err: any, videojuegos: Videogame[]) => {
+            const a = await Videojuegos.find({developers: {$in: seleccionado } }, (err: any, videojuegos: Videogame[]) => {
+
+                let lista: PartialVideogame[] = [];
 
                 videojuegos.forEach((videojuego: Videogame) => {
 
-                    listaVideojuegos.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
+                    lista.push({name: videojuego.name, lanzamiento: videojuego.lanzamiento, platforms: videojuego.platforms, urlImage: videojuego.urlImage, slug: videojuego.slug});
                 })
+                return lista;
             })
+            // @ts-ignore
+            return a;
         }
 
     }
@@ -108,15 +128,9 @@ export const buscarVideojuegosPorPalabra = async (palabra: string | undefined, p
 
 export const obtenerVideojuego = async (slug: string): Promise<any> => {
 
-    const videojuego = await Videojuegos.find({slug: { $eq: slug } }, (err: any, videojuegos: Videogame[]) => {
+    const videojuego = await Videojuegos.find({slug: { $eq: slug } }, null);
 
-        return videojuegos;
-    });
-
-    const valoraciones = await Valoraciones.find({slug: { $eq: slug } }, (err: any, valoracions: Valoracion[]) => {
-
-        return valoracions;
-    });
+    const valoraciones = await Valoraciones.find({slug: { $eq: slug } }, null);
 
     return {videojuego, valoraciones};
 }
